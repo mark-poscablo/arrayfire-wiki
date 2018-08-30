@@ -52,11 +52,12 @@ Given below is the layout of the example function inside the library.
      |__ backend
           |__ cpu
           |    |__ exampleFunction.[hpp|cpp]
-          |    |    - Wrapper level for the CPU algorithm
+          |    |    - Wrapper level for the CPU algorithm, which can call your
+          |    |      own and/or other existing CPU kernels
           |    |
           |    |__ kernel
           |    |    |__ exampleFunction.hpp
-          |    |         - CPU Backend core algorithm
+          |    |         - Add your CPU algorithm here
           |    |
           |    |__ CMakeLists.txt (should already exist)
           |         - Add your exampleFunction.[hpp|cpp] and
@@ -92,7 +93,7 @@ Given below is the layout of the example function inside the library.
                |    |      This char array is passed to OpenCL API calls to
                |    |      dispatch the actual OpenCL kernel.
                |    |__ exampleFunction.cl (OpenCL Kernel file)
-               |         - Actual OpenCL kernels
+               |         - Add your actual OpenCL kernels here
                |         - See the note above about how this file is "linked"
                |           with exampleFunction.hpp. To support the described
                |           scheme above, a header file (in kernel_headers/) is
@@ -106,13 +107,26 @@ Given below is the layout of the example function inside the library.
 
     test
      |__ exampleFunction.cpp
-     |   - Put all your unit tests here. Refer to the "Writing unit tests" section of the wiki                    
-     |     for this part
+     |   - Add all your unit tests here. Refer to the "Writing unit tests"
+     |     section of the wiki for this part.
+     |   - It is good practice to add a test for the documentation's code
+     |     snippets here, to verify that the public-facing sample indeed works
+     |
      |__ data
           |__ exampleFunction
                |__ <test_data_name>.test
                |__ <another_test_data_name>.test
-                   - Refer to the "Unit test data format" section of the wiki for this part 
+                   - Refer to the "Unit test data format" section of the wiki for
+                     this part 
+
+    docs
+     |__ details/<domain>.dox
+          - Add your functions' brief and detailed descriptions here.
+          - Note that you can add references to code snippets here for
+            demonstration purposes, which are actually displayed in the
+            description when rendered. Ideally they are part of the test suite
+            for the new function(s)
+          - See existing documentation sections for examples
 
 For example, if you are about to implement median filter feature, copy all the files mentioned above and replace the file name `exampleFunction` with `medianfilter`. Now open the files one after another using your favorite editor starting at the top of the hierarchy and change the content to fit your needs.
 
