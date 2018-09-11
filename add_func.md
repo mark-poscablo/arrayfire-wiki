@@ -1,8 +1,25 @@
-We have an example function built into the library itself. All you need to do is to copy the files with appropriate file names corresponding to the new feature and add your implementation.
+Listed below are the necessary files inside the directory structure that you
+need to add or modify for implementing a new function in ArrayFire. We have
+an example function (`exampleFunction`) built into the library itself, which
+shows how a new developer might go about implementing a new function in
+ArrayFire. It demonstrates how the user-facing C/C++ API talks to each backend.
+You can use its existing files as a guide or as a starting point for your
+implementation (of course by making a copy of the files and then modifying them).
+Note, however, that you may need to add or modify other files, depending on the
+situation.
 
-Given below is the layout of the example function inside the library.
+A quick layout is given below to serve as a quick reference on what files must
+be added and/or modified, and where they are located. Further below, a more
+detailed layout is given, which describes the purpose of each file and some
+important details to take into account when adding/modifying those files.
 
-### Quick layout:
+After you have added and modified all the necessary files for your function, you
+are welcome to submit a pull request to ArrayFire. Doing so will queue your
+changes for building and testing in our continuous integration pipeline (make
+sure that you have created tests indeed!), but at least one of us needs to review
+and approve your changes before merging them in.
+
+### Quick layout
 
     include
      |__ af/<domain>.h
@@ -12,44 +29,44 @@ Given below is the layout of the example function inside the library.
      |__ api
      |    |__ c
      |    |    |__ exampleFunction.cpp
-     |    |    |__ CMakeLists.txt (should already exist)
+     |    |    |__ CMakeLists.txt
      |    |
      |    |__ cpp
      |    |    |__ <domain>.cpp
-     |    |    |__ CMakeLists.txt (should already exist)
+     |    |    |__ CMakeLists.txt
      |    |
      |    |__ unified
      |         |__ <domain>.cpp
-     |         |__ CMakeLists.txt (should already exist)
+     |         |__ CMakeLists.txt
      |
      |__ backend
           |__ cpu
           |    |__ exampleFunction.[hpp|cpp]
           |    |__ kernel
           |    |    |__ exampleFunction.hpp
-          |    |
-          |    |__ CMakeLists.txt (should already exist)
+          |    |__ CMakeLists.txt
           |
           |__ cuda
           |    |__ exampleFunction.[hpp|cu]
-          |    |
           |    |__ kernel
           |    |    |__ exampleFunction.hpp
-          |    |
-          |    |__ CMakeLists.txt (should already exist)
+          |    |__ CMakeLists.txt
           |
           |__ opencl
                |__ exampleFunction.[hpp|cpp]
                |__ kernel
                |    |__ exampleFunction.hpp
-               |    |__ exampleFunction.cl (OpenCL Kernel file)
-               |
-               |__ CMakeLists.txt (should already exist)
+               |    |__ exampleFunction.cl
+               |__ CMakeLists.txt
 
     test
      |__ exampleFunction.cpp
      |__ data
-          |__ exampleFunction
+          |__ exampleFunction.test
+          |__ other test data needed
+
+    docs
+     |__ details/<domain>.dox
 
 ### Detailed Layout
 
@@ -57,10 +74,11 @@ Given below is the layout of the example function inside the library.
 
 * `include/af/<domain>.h`
   * Contains the C and C++ declarations of your new function
-  * If you are working on a function that already belongs to an existing
-    group such as image processing, statistics etc. add your declaration
-    to that group. Otherwise, create a header and include it in include/arrayfire.h
-  * Add both the C and C++ declarations for your new function.
+  * If you are working on a function that already belongs to an existing group
+    such as image processing, statistics, etc., add your declarations to that
+    group/domain. Otherwise, create a header and include it in
+    `include/arrayfire.h`
+  * Add both the C and C++ declarations for your new function here.
   * Prefix the C function name with `af_`.
   * If the C++ function has any arguments with default values, initialize
     those arguments here
@@ -102,7 +120,7 @@ Given below is the layout of the example function inside the library.
     for examples
 
 * `src/api/cpp/unified/CMakeLists.txt` (should already exist)
-  * Add your \<domain\>.cpp file here
+  * Add your `<domain>.cpp` file here
 
 #### CPU Backend 
 
@@ -116,7 +134,7 @@ Given below is the layout of the example function inside the library.
   * Contains the CPU-specific implementation of the algorithm here
   
 * `src/backend/cpu/CMakeLists.txt` (should already exist)
-  * Add your exampleFunction.[hpp|cpp] and
+  * Add your `exampleFunction.[hpp|cpp]` and
     `kernel/exampleFunction.hpp` to their appropriate sections
     here
 
@@ -147,8 +165,8 @@ Given below is the layout of the example function inside the library.
 * `src/backend/opencl/kernel/exampleFunction.hpp`
   * Contains the OpenCL kernel wrappers
   * Note that because of the nature of how OpenCL operates, this file does not
-    actually link with the exampleFunction.cl file. Rather, this includes
-    kernel_headers/exampleFunction.hpp, which contains the OpenCL kernel in the
+    actually link with the `exampleFunction.cl` file. Rather, this includes
+    `kernel_headers/exampleFunction.hpp`, which contains the OpenCL kernel in the
     form of a runtime char array. This char array is passed to OpenCL API calls
     to dispatch the actual OpenCL kernel.
 
@@ -160,8 +178,8 @@ Given below is the layout of the example function inside the library.
     object representation of this file.
 
 * `src/backend/opencl/CMakeLists.txt` (should already exist)
-  * Add your exampleFunction.[hpp|cpp] and kernel/exampleFunction.hpp to their
-    appropriate sections here
+  * Add your `exampleFunction.[hpp|cpp]` and `kernel/exampleFunction.hpp` to
+    their appropriate sections here
 
 #### Tests 
 
@@ -169,27 +187,20 @@ Given below is the layout of the example function inside the library.
   * Contains unit tests for the new function. Refer to the
     [Writing unit tests](https://github.com/arrayfire/arrayfire/wiki/Writing-Unit-Tests)
     section of the wiki for this part.
-  * It is good practice to add a test for the documentation's code
-    snippets here, to verify that the public-facing example indeed works
+  * It is good practice to add a test for the documentation's code snippets here,
+    to verify that the public-facing example indeed works
   
 * `test/data/exampleFunction/<test_data_name>.test`
   * Refer to the
     [Unit test data format](https://github.com/arrayfire/arrayfire/wiki/Unit-Tests-Data-Format)
-    section of the wiki for this part. You can have multiple test files if you need
+    section of the wiki for this part. You can have multiple test files if needed
 
 #### Documentation 
 
 * `docs/details/<domain>.dox`
   * Contains the Doxygen markup for the domain's functions
-  * Add your functions' brief and detailed descriptions here.
-    Note that you can add references to code snippets here for
-    demonstration purposes, which are actually displayed in the
-    description when rendered. Ideally they are part of the test suite
-    for the new function(s)
+  * Add your functions' brief and detailed descriptions here. Note that you can
+    add references to code snippets here for demonstration purposes, which are
+    actually displayed in the description when rendered. Ideally, they would be
+    part of the test suite for the same function(s)
   * See existing documentation sections for examples
-
-For example, if you are about to implement median filter feature, copy all the files mentioned above and replace the file name `exampleFunction` with `medianfilter`. Now open the files one after another using your favorite editor starting at the top of the hierarchy and change the content to fit your needs.
-
-**All the exampleFunction.\* files shown below are documented to explain how the user facing API (C/C++) talks to each backend and how a new developer might go about to implement a new function in ArrayFire.**
-
-**Important Note:** This is only a simple example of how a function is added to ArrayFire. You may have to modify other files some times depending on the situation. You can always discuss with us through [Gitter](https://gitter.im/arrayfire/arrayfire), our [mailing list](https://groups.google.com/forum/#!forum/arrayfire-users), or [email](mailto:technical@arrayfire.com).
